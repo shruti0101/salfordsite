@@ -4,7 +4,7 @@ import ContactForm from "@/components/Landingpage/Popup";
 import PrimaryButton from "@/components/sub-components/PrimaryButton";
 
 import { advantages, countries, products, testimonial } from "@/Data";
-import { CheckIcon, Mail, Phone } from "lucide-react";
+import { CheckIcon, Mail } from "lucide-react";
 import React, { useRef, useState } from "react";
 const IMAGE_HERO_FACTORY = "/landing-page/195.jpg";
 
@@ -63,7 +63,7 @@ export default function SalfordLandingPage() {
         <div className="absolute inset-0 bg-gray-900 opacity-60"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-          <p className="text-blue-400 font-semibold text-base sm:text-lg mb-4 uppercase tracking-widest">
+          <p className="text-blue-400 mt-4 font-semibold text-base sm:text-lg mb-4 uppercase tracking-widest">
             Premium Global Titanium Dioxide Manufacturing
           </p>
 
@@ -76,7 +76,7 @@ export default function SalfordLandingPage() {
 
           <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto mb-10">
             Consistent, high-performance TiO₂ pigments and solutions, backed by
-            15+ years of export expertise and global standards.
+             years of export expertise and global standards.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
@@ -86,15 +86,9 @@ export default function SalfordLandingPage() {
             >
               Request a Quote
             </button>
-            {openForm && (
-              <ContactForm
-                isOpen={openForm}
-                onClose={() => setOpenForm(false)}
-              />
-            )}
-
+        
             <a
-              href="/industries"
+              href="/products"
               className="px-8 py-3 text-lg font-medium text-blue-600 border-2 border-blue-600 rounded-lg bg-blue-50 transition duration-300"
             >
               Explore Our Featured Grades
@@ -102,6 +96,80 @@ export default function SalfordLandingPage() {
           </div>
         </div>
       </header>
+
+
+
+
+
+ {/* Products Section */}
+<section className="relative py-10 bg-gradient-to-b from-white to-blue-50">
+  <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+    {/* Heading */}
+    <div className="text-center mb-12" data-aos="fade-up">
+      <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
+        Our <span className="text-blue-600">Products</span>
+      </h2>
+      <p className="text-black max-w-2xl mx-auto text-lg">
+        Explore our range of top-quality products crafted with innovation and precision. 
+        Each product reflects our commitment to performance, durability, and trust.
+      </p>
+    </div>
+
+    {/* Product Grid */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  {products.map(({ title, para, image }, idx) => (
+    <div
+      key={idx}
+      className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100"
+      data-aos="fade-up"
+      data-aos-delay={idx * 100}
+    >
+      <div className="flex flex-col items-center text-center">
+        <Image
+          src={image}
+          width={400}
+          height={400}
+          alt={title}
+          className="rounded-2xl w-full h-auto object-cover mb-4 transition-transform duration-500 group-hover:scale-105"
+        />
+        <h3 className=" text-base md:text-xl font-bold text-black mb-2 group-hover:text-blue-600">
+          {title}
+        </h3>
+        <p className="  text-black leading-relaxed">{para}</p>
+
+        {/* Centered Button */}
+        <button  onClick={() => setOpenForm(true)} className="bg-red-500 py-2 px-5 text-white cursor-pointer rounded mt-4 font-medium shadow-md hover:bg-red-600 transition-all duration-300">
+          Enquire Now
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+
+    {/* After Products Paragraph */}
+    <div className="mt-8 text-center max-w-3xl mx-auto" data-aos="fade-up">
+      <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+        Excellence Beyond Expectations
+      </h3>
+      <p className="text-black text-sm md:text-lg leading-relaxed">
+        Our products are designed to meet the highest standards of performance and reliability. 
+        We believe in delivering value that lasts — helping our clients stay ahead in a rapidly evolving world. 
+        With every innovation, we aim to create solutions that truly make a difference.
+      </p>
+    </div>
+  </div>
+
+  {/* Decorative Background Blur */}
+  <div className="absolute -top-20 left-10 w-60 h-60 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
+  <div className="absolute bottom-0 right-10 w-72 h-72 bg-blue-300 rounded-full blur-3xl opacity-20"></div>
+</section>
+
+
+
+
+
+
 
       {/* second   */}
       <section className="py-12  border-b border-gray-200">
@@ -115,7 +183,7 @@ export default function SalfordLandingPage() {
           </h2>
 
           <Crousel />
-          <p className="text-gray-500 mt-6 italic">
+          <p className="text-black text-sm mt-6 italic">
             Salford is a global leader in Titanium Dioxide manufacturing,
             dedicated to supplying high-quality TiO₂ (Titanium Dioxide) for
             industrial applications worldwide. With advanced TiO₂ manufacture
@@ -130,11 +198,11 @@ export default function SalfordLandingPage() {
       </section>
 
       {/* why whoose us  */}
-      <section className="py-20 bg-white">
+      <section className="py-3 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Heading */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+          <div className="text-center mb-5 md:mb-10">
+            <h2 className="text-3xl sm:text-4xl  font-extrabold text-gray-900">
               Why Businesses Choose{" "}
               <span className="text-blue-600">Salford</span>
             </h2>
@@ -183,47 +251,17 @@ export default function SalfordLandingPage() {
         </div>
       </section>
 
-      {/* products  */}
-      <section>
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
-            Our <span className="text-blue-600">Products</span>
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3">
-          <div>
-            <div className="grid grid-cols-1 gap-2 px-3 py-5 md:grid-cols-2 md:px-10  lg:px-32">
-              {products.map(({ title, para, image }, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-center p-5 rounded-2xl lg:px-20"
-                >
-                  <Image
-                    src={image}
-                    width={400}
-                    height={400}
-                    alt={title}
-                    className="rounded-2xl min-w-72 h-auto"
-                  />
-                  <p className="font-bold py-2 text-center text-lg">{title}</p>
-                  <p className="">{para}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+    
 
       {/* advanced cards  */}
-      <section className="py-20 bg-white">
+      <section className="py-8 md:py-15 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-900">
               The Salford Advantage: Your{" "}
               <span className="text-blue-600">Trusted TiO₂ Partner</span>
             </h2>
-            <p className="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">
+            <p className="text-md mt-3 text-black  max-w-3xl mx-auto">
               Salford is a global leader in Titanium Dioxide manufacturing,
               dedicated to supplying high-quality TiO₂ for industrial
               applications worldwide.
@@ -251,7 +289,7 @@ export default function SalfordLandingPage() {
       </section>
 
       {/* testimonial  */}
-      <section className="py-20 bg-gray-100">
+      <section className="py-8 md:py-13 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
@@ -276,7 +314,7 @@ export default function SalfordLandingPage() {
       </section>
 
       {/* Contact form  */}
-      <section className="px-2 py-8  flex flex-col md:flex-row bg-gray-100 md:px-5 md:gap-5 lg:px-44 lg:gap-10 lg:py-14">
+      <section className="px-3 py-8   flex flex-col md:flex-row bg-gray-100 md:px-5 md:gap-5 lg:px-44 lg:gap-10 lg:py-12">
         <div className="md:w-1/2">
           <p className="uppercase font-medium text-gray-950 md:text-lg">
             We're here to help your
@@ -291,7 +329,7 @@ export default function SalfordLandingPage() {
           </p>
           <div className="bg-gray-100">
             {/* email  */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 mb-2">
               <a
                 href="mailto:sales@aanyaenterprise.com"
                 className="flex gap-5 items-center"
@@ -303,13 +341,7 @@ export default function SalfordLandingPage() {
                 </div>
               </a>
 
-              <a href="tel:89201 09583" className="flex gap-5 items-center">
-                <Phone className="text-blue-500" />
-                <div className="flex text-blue-950 flex-col font-medium ">
-                  <span>Phone</span>
-                  <span>89201 09583</span>
-                </div>
-              </a>
+           
             </div>
           </div>
         </div>
@@ -347,7 +379,7 @@ export default function SalfordLandingPage() {
                   required
                   type="text"
                   name="name"
-                  placeholder="Jone Doe"
+                  placeholder="Your Name"
                   className="bg-gray-200 px-3 py-1 rounded-lg"
                 />
               </div>
@@ -431,7 +463,7 @@ export default function SalfordLandingPage() {
       </section>
 
       {/* 8. Find the Perfect TiO₂ Grade for Your Application (Product Explorer CTA) */}
-      <section className="py-20 bg-blue-50">
+      <section className="py-10 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="relative h-64 md:h-80 w-full rounded-xl overflow-hidden shadow-2xl">
@@ -458,7 +490,7 @@ export default function SalfordLandingPage() {
                   Explore Product Grades
                 </PrimaryButton>
                 <a
-                  href="/contact"
+                  href="/contact-us"
                   className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition duration-200"
                 >
                   Need Technical Assistance? Contact Our Experts. →
@@ -468,6 +500,14 @@ export default function SalfordLandingPage() {
           </div>
         </div>
       </section>
+
+          {openForm && (
+              <ContactForm
+                isOpen={openForm}
+                onClose={() => setOpenForm(false)}
+              />
+            )}
+
     </div>
   );
 }

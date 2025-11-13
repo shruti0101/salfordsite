@@ -1,37 +1,93 @@
 "use client";
 import React, { useRef, useState } from "react";
+import axios from "axios";
 
 export default function ContactForm({ isOpen, onClose }) {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+
+  // form State
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
 
   if (!isOpen) return null;
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+
+  //   const formData = new FormData(formRef.current);
+
+  //   try {
+  //     const response = await fetch("https://formsubmit.co/ajax/inquiry.promozione@gmail.com", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+
+  //     if (response.ok) {
+  //       setSuccess(true);
+  //       formRef.current.reset();
+  //     } else {
+  //       setError("Something went wrong. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     setError("Network error. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus("Sending...");
     setLoading(true);
-    setError("");
-
-    const formData = new FormData(formRef.current);
-
     try {
-      const response = await fetch("https://formsubmit.co/ajax/inquiry.promozione@gmail.com", {
-        method: "POST",
-        body: formData,
-      });
+      const formData = {
+        platform: "Salford Landing page",
+        platformEmail: "sales@aanyaenterprise.com",
+        name,
+        email,
+        place: country,
+        phone,
+        message,
+      };
 
-      if (response.ok) {
-        setSuccess(true);
-        formRef.current.reset();
+      const { data } = await axios.post(
+        "https://brandbnalo.com/api/form/add",
+        formData
+      );
+
+      if (data?.success) {
+        setLoading(false);
+        setStatus("✅ Message sent successfully!");
+        setName("");
+        setEmail("");
+        setCountry("");
+        setPhone("");
+        setMessage("");
+
+        const whatsappText = `Hi, I am ${name}.\n \nEmail: ${email}\n\nMessage: ${message}\n\nContact: ${phone} \n Place: ${country}`;
+        const waUrl = `https://wa.me/918527557778?text=${encodeURIComponent(
+          whatsappText
+        )}`;
+
+        // Delay WhatsApp redirect by 1 second to show success message
+        setTimeout(() => {
+          window.open(waUrl, "_blank");
+        }, 1000);
       } else {
-        setError("Something went wrong. Please try again.");
+        setStatus("❌ Failed to send. Please check your form or try again.");
       }
-    } catch (err) {
-      setError("Network error. Please try again.");
-    } finally {
-      setLoading(false);
+
+      console.log(formData);
+    } catch (error) {
+      console.log(error);
+      setStatus(error?.message);
     }
   };
 
@@ -72,86 +128,98 @@ export default function ContactForm({ isOpen, onClose }) {
           </h2>
           <div className="w-24 h-[3px] bg-gradient-to-r from-[#00C9FF] to-[#92FE9D] mx-auto mt-3 mb-5 rounded-full"></div>
 
-          {!success ? (
-            <form method="post" ref={formRef} onSubmit={handleSubmit} className="space-y-3">
-              <input type="hidden" name="_subject" value="New Product Enquiry" />
-              <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="product" value="Enquiry From Website" />
-              <input type="hidden" name="_captcha" value="false" />
-                    <input type="hidden" name="_nosponsor" value="true" />
-                  <input type="hidden" name="_cc" value="sales@aanyaenterprise.com" />
+          <form
+            // method="post"
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="space-y-3"
+          >
+            {/* <input type="hidden" name="_subject" value="New Product Enquiry" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="product" value="Enquiry From Website" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_nosponsor" value="true" />
+            <input type="hidden" name="_cc" value="sales@aanyaenterprise.com" /> */}
 
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
+              required
+            />
 
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
-                required
-              />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              type="tel"
+              name="phone"
+              maxLength={10}
+              minLength={10}
+              pattern="[0-9]{10}"
+              placeholder="Enter Phone Number"
+              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
+              required
+            />
 
-              <input
-                type="tel"
-                name="phone"
-                maxLength={10}
-                minLength={10}
-                pattern="[0-9]{10}"
-                placeholder="Enter Phone Number"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
-                required
-              />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              name="email"
+              placeholder="Email"
+              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
+              required
+            />
 
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
-                required
-              />
+            {/* ✅ Country Dropdown */}
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              name="country"
+              defaultValue=""
+              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
+              required
+            >
+              {countries.map((country, idx) => (
+                <option key={idx} value={country} className="text-black">
+                  {country}
+                </option>
+              ))}
+            </select>
 
-              {/* ✅ Country Dropdown */}
-              <select
-              
-                name="country"
-                defaultValue=""
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
-                required
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              name="message"
+              placeholder="Message"
+              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition h-28 resize-none"
+            ></textarea>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
+            >
+              {loading ? "Sending..." : "Send Message"}
+            </button>
+
+            {status && (
+              <p
+                className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
+                  status.startsWith("✅")
+                    ? "bg-green-100 text-green-800"
+                    : status.startsWith("❌")
+                      ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
+                }`}
               >
-                
-                {countries.map((country, idx) => (
-                  <option key={idx} value={country} className="text-black">
-                    {country}
-                  </option>
-                ))}
-              </select>
-
-              <textarea
-                name="message"
-                placeholder="Message"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition h-28 resize-none"
-              ></textarea>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
-              >
-                {loading ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          ) : (
-            <div className="text-center text-white space-y-4">
-              <p className="text-lg font-semibold">✅ Message Sent Successfully!</p>
-              <button
-                onClick={() => setSuccess(false)}
-                className="bg-gradient-to-r from-[#00C9FF] to-[#0077E6] px-6 py-2 rounded-lg text-white"
-              >
-                Send Another
-              </button>
-            </div>
-          )}
-
-          {error && <p className="text-red-400 text-center mt-3">{error}</p>}
+                {status}
+              </p>
+            )}
+          </form>
         </div>
       </div>
     </div>

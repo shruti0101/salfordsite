@@ -750,6 +750,22 @@ export const products = [
     para: "SALFORD 269 is a blue tint tone rutile titanium dioxide pigment offering high brightness, excellent dispersibility, and easy processing for non-durable indoor plastic applications.",
     image: "/products/269.webp",
   },
+
+    {
+    title: "SALFORD 288",
+    para: "SALFORD 288 is a multi-purpose, blue tint tone, chloride-process, rutile titanium dioxide pigment, designed to give an outstanding combination of ease of dispersion, excellent optical properties and good durability in a wide range of plastic applications.",
+    image: "/products/288.webp",
+  },
+
+
+   {
+    title: "SALFORD 280",
+    para: "SALFORD 280 is a multi-purpose rutile titanium dioxide pigment with a blue tint tone, providing superior brightness, opacity, and durability across various PVC and plastic applications It offers warm-white tone and excellent stability for high-temperature applications.",
+    image: "/products/280.webp",
+  },
+
+   
+  
 ];
 
 export const landingPageSecondSectionProduct = [
@@ -758,7 +774,7 @@ export const landingPageSecondSectionProduct = [
     title: "Paints & Coatings",
   },
   {
-    image: "/landing-page/4724.webp",
+    image: "/industry/4.webp",
     title: "Plastics",
   },
   {
