@@ -40,56 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
- const items = [
-    {
-      title: "Paints and Coatings",
-      desc: "Titanium dioxide is indispensable for paints and coatings, offering exceptional brightness, whiteness, and opacity. It enhances durability, provides UV resistance, and improves overall performance, making it ideal for both interior and exterior applications.",
-      icon: <FaPaintRoller />,
-      isYellow: true,
-    },
-    {
-      title: "Plastics and Masterbatches",
-      desc: "In the plastics industry, TiO₂ provides high opacity, uniform color, and weather resistance, essential for products such as PVC pipes, automotive components, packaging materials, and household plastics. Our Rutile-grade TiO₂ ensures that plastics maintain their color and performance over time.",
-      icon: <FaCube />,
-      isYellow: false,
-    },
-    {
-      title: "Paper and Printing Inks",
-      desc: "Titanium dioxide improves whiteness, opacity, and smoothness in paper production, resulting in higher quality sheets that are easier to print on. In printing inks, TiO₂ enhances vividness, sharpness, and brightness. Salford helps World publishers, printers, and paper mills achieve better results.",
-      icon: <FaFileAlt />,
-      isYellow: false,
-    },
-    {
-      title: "Textiles and Fibers",
-      desc: "In textiles, TiO₂ contributes to color brilliance, uniformity, and finish, especially in synthetic fibers like polyester and nylon. It also helps maintain brightness and appearance during processing and washing.",
-      icon: <FaTshirt />,
-      isYellow: false,
-    },
-    {
-      title: "Cosmetics and Personal Care",
-      desc: "For the cosmetics industry, Anatase-grade TiO₂ is essential for products like sunscreens, skincare, powders, and makeup, providing safe UV-blocking properties, whiteness, and opacity. With strict compliance to international safety standards.",
-      icon: <FaSpa />,
-      isYellow: false,
-    },
-    {
-      title: "Food and Pharmaceuticals",
-      desc: "TiO₂ plays a vital role in edible coatings, confectionery, candies, tablets, and capsules, providing uniform color, stability, and compliance with FDA and other food-grade standards.",
-      icon: <FaPills />,
-      isYellow: false,
-    },
-    {
-      title: "Construction and Industrial Applications",
-      desc: "Beyond consumer goods, TiO₂ is used in cement, adhesives, sealants, and industrial coatings, enhancing whiteness, opacity, and durability.",
-      icon: <FaBuilding />,
-      isYellow: false,
-    },
-    {
-      title: "Automotive Industry",
-      desc: "In automotive coatings and plastics, TiO₂ ensures long-lasting color, gloss, and weather resistance. It helps vehicles maintain their aesthetic appeal while protecting surfaces from UV rays and harsh environmental conditions.",
-      icon: <FaCar />,
-      isYellow: false,
-    },
-
-    
-  ];
+/Landingpage2
+   
