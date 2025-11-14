@@ -1,52 +1,73 @@
 "use client";
-
+import axios from "axios";
 import ContactForm from "@/components/Landingpage/Popup";
 import PrimaryButton from "@/components/sub-components/PrimaryButton";
 
 import { advantages, countries, products, testimonial } from "@/Data";
-import { CheckIcon, Mail } from "lucide-react";
-import React, { useRef, useState } from "react";
+import { CheckIcon } from "lucide-react";
+import React, { useState } from "react";
 const IMAGE_HERO_FACTORY = "/landing-page/195.jpg";
 
 import { advantagesCard } from "@/components/sub-components/data";
 import Image from "next/image";
 import Crousel from "@/components/sub-components/Crousel";
+import HeroForm from "@/components/Landingpage/HeroForm";
 
 export default function SalfordLandingPage() {
   const [openForm, setOpenForm] = useState(false);
 
   // for form
-  const formRef = useRef(null);
+
+
+
+  // form State
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+
+  const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus("Sending...");
     setLoading(true);
-    setError("");
-
-    const formData = new FormData(formRef.current);
-
     try {
-      const response = await fetch(
-        "https://formsubmit.co/ajax/inquiry.promozione@gmail.com",
-        {
-          method: "POST",
-          body: formData,
-        }
+      const formData = {
+        platform: "Salford Landing page",
+        platformEmail: "sales@aanyaenterprise.com",
+        name,
+        email,
+        place: country,
+        phone,
+        message,
+      };
+
+      const { data } = await axios.post(
+        "https://brandbnalo.com/api/form/add",
+        formData
       );
 
-      if (response.ok) {
-        setSuccess(true);
-        formRef.current.reset();
+      if (data?.success) {
+        setLoading(false);
+        setStatus("✅ Message sent successfully!");
+        setName("");
+        setEmail("");
+        setCountry("");
+        setPhone("");
+        setMessage("");
+
+
       } else {
-        setError("Something went wrong. Please try again.");
+        setStatus("❌ Failed to send. Please check your form or try again.");
       }
-    } catch (err) {
-      setError("Network error. Please try again.");
-    } finally {
-      setLoading(false);
+
+      console.log(formData);
+    } catch (error) {
+      console.log(error);
+      setStatus(error?.message);
     }
   };
 
@@ -76,17 +97,17 @@ export default function SalfordLandingPage() {
 
           <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto mb-10">
             Consistent, high-performance TiO₂ pigments and solutions, backed by
-             years of export expertise and global standards.
+            years of export expertise and global standards.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <button
-              className="px-8 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg shadow-xl hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] active:scale-100 uppercase tracking-wider"
+              className="px-2 py-1 lg:px-8 lg:py-3 text-lg font-bold text-white bg-blue-600 rounded-lg shadow-xl hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] active:scale-100 uppercase tracking-wider"
               onClick={() => setOpenForm(true)}
             >
               Request a Quote
             </button>
-        
+
             <a
               href="/products"
               className="px-8 py-3 text-lg font-medium text-blue-600 border-2 border-blue-600 rounded-lg bg-blue-50 transition duration-300"
@@ -96,80 +117,80 @@ export default function SalfordLandingPage() {
           </div>
         </div>
       </header>
+      {/* hero form  */}
+      <HeroForm />
 
+      {/* Products Section */}
+      <section className="relative py-10 bg-gradient-to-b from-white to-blue-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          {/* Heading */}
+          <div className="text-center mb-12" data-aos="fade-up">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
+              Our <span className="text-blue-600">Products</span>
+            </h2>
+            <p className="text-black max-w-2xl mx-auto text-lg">
+              Explore our range of top-quality products crafted with innovation
+              and precision. Each product reflects our commitment to
+              performance, durability, and trust.
+            </p>
+          </div>
 
+          {/* Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.map(({ title, para, image }, idx) => (
+              <div
+                key={idx}
+                className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100"
+                data-aos="fade-up"
+                data-aos-delay={idx * 100}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <Image
+                    src={image}
+                    width={400}
+                    height={400}
+                    alt={title}
+                    className="rounded-2xl w-full h-auto object-cover mb-4 transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <h3 className=" text-base md:text-xl font-bold text-black mb-2 group-hover:text-blue-600">
+                    {title}
+                  </h3>
+                  <p className="  text-black leading-relaxed">{para}</p>
 
+                  {/* Centered Button */}
+                  <button
+                    onClick={() => setOpenForm(true)}
+                    className="bg-red-500 py-2 px-5 text-white cursor-pointer rounded mt-4 font-medium shadow-md hover:bg-red-600 transition-all duration-300"
+                  >
+                    Enquire Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
 
+          {/* After Products Paragraph */}
+          <div
+            className="mt-8 text-center max-w-3xl mx-auto"
+            data-aos="fade-up"
+          >
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+              Excellence Beyond Expectations
+            </h3>
+            <p className="text-black text-sm md:text-lg leading-relaxed">
+              Our products are designed to meet the highest standards of
+              performance and reliability. We believe in delivering value that
+              lasts — helping our clients stay ahead in a rapidly evolving
+              world. With every innovation, we aim to create solutions that
+              truly make a difference.
+            </p>
+          </div>
+        </div>
 
- {/* Products Section */}
-<section className="relative py-10 bg-gradient-to-b from-white to-blue-50">
-  <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-    {/* Heading */}
-    <div className="text-center mb-12" data-aos="fade-up">
-      <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
-        Our <span className="text-blue-600">Products</span>
-      </h2>
-      <p className="text-black max-w-2xl mx-auto text-lg">
-        Explore our range of top-quality products crafted with innovation and precision. 
-        Each product reflects our commitment to performance, durability, and trust.
-      </p>
-    </div>
-
-    {/* Product Grid */}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-  {products.map(({ title, para, image }, idx) => (
-    <div
-      key={idx}
-      className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100"
-      data-aos="fade-up"
-      data-aos-delay={idx * 100}
-    >
-      <div className="flex flex-col items-center text-center">
-        <Image
-          src={image}
-          width={400}
-          height={400}
-          alt={title}
-          className="rounded-2xl w-full h-auto object-cover mb-4 transition-transform duration-500 group-hover:scale-105"
-        />
-        <h3 className=" text-base md:text-xl font-bold text-black mb-2 group-hover:text-blue-600">
-          {title}
-        </h3>
-        <p className="  text-black leading-relaxed">{para}</p>
-
-        {/* Centered Button */}
-        <button  onClick={() => setOpenForm(true)} className="bg-red-500 py-2 px-5 text-white cursor-pointer rounded mt-4 font-medium shadow-md hover:bg-red-600 transition-all duration-300">
-          Enquire Now
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-
-
-    {/* After Products Paragraph */}
-    <div className="mt-8 text-center max-w-3xl mx-auto" data-aos="fade-up">
-      <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-        Excellence Beyond Expectations
-      </h3>
-      <p className="text-black text-sm md:text-lg leading-relaxed">
-        Our products are designed to meet the highest standards of performance and reliability. 
-        We believe in delivering value that lasts — helping our clients stay ahead in a rapidly evolving world. 
-        With every innovation, we aim to create solutions that truly make a difference.
-      </p>
-    </div>
-  </div>
-
-  {/* Decorative Background Blur */}
-  <div className="absolute -top-20 left-10 w-60 h-60 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
-  <div className="absolute bottom-0 right-10 w-72 h-72 bg-blue-300 rounded-full blur-3xl opacity-20"></div>
-</section>
-
-
-
-
-
-
+        {/* Decorative Background Blur */}
+        <div className="absolute -top-20 left-10 w-60 h-60 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
+        <div className="absolute bottom-0 right-10 w-72 h-72 bg-blue-300 rounded-full blur-3xl opacity-20"></div>
+      </section>
 
       {/* second   */}
       <section className="py-12  border-b border-gray-200">
@@ -251,8 +272,6 @@ export default function SalfordLandingPage() {
         </div>
       </section>
 
-    
-
       {/* advanced cards  */}
       <section className="py-8 md:py-15 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -299,7 +318,10 @@ export default function SalfordLandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonial.map(({ quote, author, title }, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 h-full flex flex-col justify-between transform transition duration-300 hover:shadow-2xl hover:-translate-y-1">
+              <div
+                key={index}
+                className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 h-full flex flex-col justify-between transform transition duration-300 hover:shadow-2xl hover:-translate-y-1"
+              >
                 <p className="text-lg italic text-gray-900 mb-6">"{quote}"</p>
                 <div>
                   <p className="font-semibold text-blue-600 text-lg">
@@ -327,138 +349,112 @@ export default function SalfordLandingPage() {
             Are you looking for top-quality chemical tailored to your needs?
             Reach out to us.
           </p>
-          <div className="bg-gray-100">
-            {/* email  */}
-            <div className="flex flex-col gap-5 mb-2">
-              <a
-                href="mailto:sales@aanyaenterprise.com"
-                className="flex gap-5 items-center"
-              >
-                <Mail className="text-blue-500" />
-                <div className="flex text-blue-950 flex-col font-medium ">
-                  <span>E-mail</span>
-                  <span>sales@aanyaenterprise.com</span>
-                </div>
-              </a>
-
-           
-            </div>
-          </div>
         </div>
         <div className="md:w-1/2">
-          {!success ? (
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white px-2 py-5 rounded-xl md:px-5 lg:px-10"
-            >
-              {/* hidden  */}
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white px-2 py-5 rounded-xl md:px-5 lg:px-10"
+          >
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Name
+              </label>
               <input
-                type="hidden"
-                name="_subject"
-                value="New Product Enquiry"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
               />
-              <input type="hidden" name="_template" value="table" />
-              <input
-                type="hidden"
-                name="product"
-                value="Enquiry From Website"
-              />
-              <input type="hidden" name="_captcha" value="false" />
-              <input type="hidden" name="_nosponsor" value="true" />
-              <input
-                type="hidden"
-                name="_cc"
-                value="sales@aanyaenterprise.com"
-              />
-
-              <div className="flex flex-col my-3">
-                <label htmlFor="name" className="font-semibold">
-                  Name
-                </label>
-                <input
-                  required
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  className="bg-gray-200 px-3 py-1 rounded-lg"
-                />
-              </div>
-              <div className="flex flex-col my-3">
-                <label htmlFor="name" className="font-semibold">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  className="bg-gray-200 px-3 py-1 rounded-lg"
-                />
-              </div>
-              <div className="flex flex-col my-3">
-                <label htmlFor="name" className="font-semibold">
-                  Country
-                </label>
-                <select
-                  name="country"
-                  defaultValue=""
-                  required
-                  placeholder="Email"
-                  className="bg-gray-200 px-3 py-1 rounded-lg"
-                >
-                  {countries.map((country, idx) => (
-                    <option key={idx} value={country} className="text-black">
-                      {country}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col my-3">
-                <label htmlFor="name" className="font-semibold">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  maxLength={10}
-                  minLength={10}
-                  pattern="[0-9]{10}"
-                  placeholder="Enter Phone Number"
-                  className="bg-gray-200 px-3 py-1 rounded-lg"
-                />
-              </div>
-
-              <div className="flex flex-col my-3">
-                <label htmlFor="name" className="font-semibold">
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  type="text"
-                  placeholder="Inform me about this"
-                  className="bg-gray-200 px-3 py-1 rounded-lg"
-                />
-              </div>
-
-              <button
-                disabled={loading}
-                className="my-4 rounded-full bg-[#0071E9] text-white py-2 px-5"
-              >
-                {loading ? "Get a Solution..." : "Get a solution"}
-              </button>
-            </form>
-          ) : (
-            <div className="text-center text-white space-y-4">
-              <p className="text-lg font-semibold">
-                ✅ Message Sent Successfully!
-              </p>
-              <button
-                onClick={() => setSuccess(false)}
-                className="bg-gradient-to-r from-[#00C9FF] to-[#0077E6] px-6 py-2 rounded-lg text-white"
-              >
-                Send Another
-              </button>
             </div>
-          )}
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Email
+              </label>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Country
+              </label>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                name="country"
+                defaultValue=""
+                required
+                placeholder="Email"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              >
+                {countries.map((country, idx) => (
+                  <option key={idx} value={country} className="text-black">
+                    {country}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Phone
+              </label>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                type="tel"
+                name="phone"
+                maxLength={10}
+                minLength={10}
+                pattern="[0-9]{10}"
+                placeholder="Enter Phone Number"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
+
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Message
+              </label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                name="message"
+                type="text"
+                placeholder="Inform me about this"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="my-4 rounded-full bg-[#0071E9] text-white py-2 px-5"
+            >
+              {loading ? "Get a Solution..." : "Get a solution"}
+            </button>
+
+            {status && (
+              <p
+                className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
+                  status.startsWith("✅")
+                    ? "bg-green-100 text-green-800"
+                    : status.startsWith("❌")
+                      ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {status}
+              </p>
+            )}
+          </form>
         </div>
       </section>
 
@@ -501,13 +497,9 @@ export default function SalfordLandingPage() {
         </div>
       </section>
 
-          {openForm && (
-              <ContactForm
-                isOpen={openForm}
-                onClose={() => setOpenForm(false)}
-              />
-            )}
-
+      {openForm && (
+        <ContactForm isOpen={openForm} onClose={() => setOpenForm(false)} />
+      )}
     </div>
   );
 }
