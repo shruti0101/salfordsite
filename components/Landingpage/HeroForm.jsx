@@ -1,11 +1,11 @@
 import { countries } from "@/Data";
 import React, { useState } from "react";
 import axios from "axios";
-
+import { useRouter } from "next/navigation";
 const HeroForm = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-
+  const router = useRouter();   
   // form State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,6 +34,8 @@ const HeroForm = () => {
       );
 
       if (data?.success) {
+
+                router.push("/thankyou");   
         setLoading(false);
         setStatus("✅ Message sent successfully!");
         setName("");
@@ -115,6 +117,7 @@ const HeroForm = () => {
           onChange={(e) => setMessage(e.target.value)}
           type="text"
           placeholder="Message"
+          required
           className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full "
         />
 

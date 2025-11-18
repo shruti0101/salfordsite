@@ -1,7 +1,64 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const Page = () => {
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  // form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // simple validation
+    if (!firstName.trim()) return setStatus("❌ First name is required");
+    if (!lastName.trim()) return setStatus("❌ Last name is required");
+    if (!/^\d{10}$/.test(phone)) return setStatus("❌ Phone must be 10 digits");
+    if (!email.includes("@")) return setStatus("❌ Invalid email address");
+    if (!message.trim()) return setStatus("❌ Message cannot be empty");
+
+    setStatus("Sending...");
+    setLoading(true);
+
+    const formData = {
+      platform: "Contact Us Page",
+      platformEmail: "sales@aanyaenterprise.com",
+      name: `${firstName} ${lastName}`,
+      email,
+      phone,
+      place: "N/A",
+      message,
+    };
+
+    try {
+      const { data } = await axios.post(
+        "https://brandbnalo.com/api/form/add",
+        formData
+      );
+
+      if (data?.success) {
+        setStatus("✅ Message sent successfully!");
+        setFirstName("");
+        setLastName("");
+        setPhone("");
+        setEmail("");
+        setMessage("");
+      } else {
+        setStatus("❌ Something went wrong. Try again.");
+      }
+    } catch (error) {
+      setStatus("❌ " + error.message);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div>
       {/* ===== Hero Section ===== */}
@@ -50,33 +107,22 @@ const Page = () => {
                   Get in Touch
                 </h2>
 
-                {/* ✅ FormSubmit Integration */}
-                <form
-                  className="space-y-6"
-                  action="https://formsubmit.co/sales@aanyaenterprise.com"
-                  method="POST"
-                >
-                  {/* Hidden Inputs */}
-                  <input type="hidden" name="_captcha" value="false" />
-                  {/* <input
-                    type="hidden"
-                    name="_next"
-                    value="https://yourdomain.com/thank-you"
-                  /> */}
-                  <input type="hidden" name="_template" value="table" />
-
+                {/* VALIDATED REACT FORM */}
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                       type="text"
-                      name="First Name"
                       placeholder="First Name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       required
                       className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3]"
                     />
                     <input
                       type="text"
-                      name="Last Name"
                       placeholder="Last Name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       required
                       className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3]"
                     />
@@ -85,37 +131,51 @@ const Page = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                       type="tel"
-                      name="phone"
-                      maxLength={10}
-                      minLength={10}
-                      pattern="[0-9]{10}"
                       placeholder="Phone Number"
+                      value={phone}
+                      maxLength={10}
+                      onChange={(e) => setPhone(e.target.value)}
                       required
                       className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3]"
                     />
                     <input
                       type="email"
-                      name="Email"
                       placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                       className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3]"
                     />
                   </div>
 
                   <textarea
-                    name="Message"
                     placeholder="Message"
                     rows={5}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     required
                     className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3] resize-none"
                   ></textarea>
 
                   <button
                     type="submit"
+                    disabled={loading}
                     className="bg-gradient-to-r from-[#0047b3] to-[#0066cc] text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:from-[#003a99] hover:to-[#0052a3] transition-all w-full"
                   >
-                    Send Message
+                    {loading ? "Sending..." : "Send Message"}
                   </button>
+
+                  {status && (
+                    <p
+                      className={`text-center text-sm font-medium p-3 rounded-lg ${
+                        status.startsWith("✅")
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {status}
+                    </p>
+                  )}
                 </form>
               </div>
             </div>

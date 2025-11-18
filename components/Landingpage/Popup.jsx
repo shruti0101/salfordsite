@@ -1,12 +1,12 @@
 "use client";
 import React, { useRef, useState } from "react";
 import axios from "axios";
-
+import { useRouter } from "next/navigation";
 export default function ContactForm({ isOpen, onClose }) {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-
+const router = useRouter();
   // form State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -63,6 +63,7 @@ export default function ContactForm({ isOpen, onClose }) {
       );
 
       if (data?.success) {
+                router.push("/thankyou");   
         setLoading(false);
         setStatus("✅ Message sent successfully!");
         setName("");
@@ -71,24 +72,19 @@ export default function ContactForm({ isOpen, onClose }) {
         setPhone("");
         setMessage("");
 
-        const whatsappText = `Hi, I am ${name}.\n \nEmail: ${email}\n\nMessage: ${message}\n\nContact: ${phone} \n Place: ${country}`;
-        const waUrl = `https://wa.me/918527557778?text=${encodeURIComponent(
-          whatsappText
-        )}`;
 
-        // Delay WhatsApp redirect by 1 second to show success message
-        setTimeout(() => {
-          window.open(waUrl, "_blank");
-        }, 1000);
       } else {
-        setStatus("❌ Failed to send. Please check your form or try again.");
+        setLoading(false);
+        setStatus("❌ Something went wrong. Please try again.");
       }
-
       console.log(formData);
     } catch (error) {
       console.log(error);
-      setStatus(error?.message);
+      setStatus("❌ " + error.message);
+    } finally {
+      setLoading(false);
     }
+
   };
 
   const countries = [
@@ -195,6 +191,7 @@ export default function ContactForm({ isOpen, onClose }) {
               onChange={(e) => setMessage(e.target.value)}
               name="message"
               placeholder="Message"
+              required
               className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition h-28 resize-none"
             ></textarea>
 

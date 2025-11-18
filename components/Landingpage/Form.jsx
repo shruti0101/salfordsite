@@ -112,6 +112,7 @@ const Form = () => {
           type="email"
           name="email"
           placeholder="Email"
+          required
           className="bg-gray-200 px-3 py-1 rounded-lg"
         />
       </div>
@@ -148,6 +149,7 @@ const Form = () => {
           minLength={10}
           pattern="[0-9]{10}"
           placeholder="Enter Phone Number"
+          required
           className="bg-gray-200 px-3 py-1 rounded-lg"
         />
       </div>
@@ -161,6 +163,7 @@ const Form = () => {
           onChange={(e) => setMessage(e.target.value)}
           name="message"
           type="text"
+          required
           placeholder="Inform me about this"
           className="bg-gray-200 px-3 py-1 rounded-lg"
         />

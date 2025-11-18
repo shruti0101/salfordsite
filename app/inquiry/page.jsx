@@ -12,7 +12,7 @@ import { advantagesCard } from "@/components/sub-components/data";
 import Image from "next/image";
 import Crousel from "@/components/sub-components/Crousel";
 import HeroForm from "@/components/Landingpage/HeroForm";
-
+import { useRouter } from "next/navigation";
 export default function SalfordLandingPage() {
   const [openForm, setOpenForm] = useState(false);
 
@@ -26,50 +26,52 @@ export default function SalfordLandingPage() {
   const [country, setCountry] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
-
+  const router = useRouter();   
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus("Sending...");
-    setLoading(true);
-    try {
-      const formData = {
-        platform: "Salford Landing page",
-        platformEmail: "sales@aanyaenterprise.com",
-        name,
-        email,
-        place: country,
-        phone,
-        message,
-      };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setStatus("Sending...");
+  setLoading(true);
 
-      const { data } = await axios.post(
-        "https://brandbnalo.com/api/form/add",
-        formData
-      );
+  try {
+    const finalMessage =
+      message.trim() === "" ? "User did not enter a message." : message;
 
-      if (data?.success) {
-        setLoading(false);
-        setStatus("✅ Message sent successfully!");
-        setName("");
-        setEmail("");
-        setCountry("");
-        setPhone("");
-        setMessage("");
+    const formData = {
+      platform: "Salford Landing page",
+      platformEmail: "sales@aanyaenterprise.com",
+      name,
+      email,
+      place: country,
+      phone,
+      message: finalMessage, // ⬅ backend will not break now
+    };
 
+    const { data } = await axios.post(
+      "https://brandbnalo.com/api/form/add",
+      formData
+    );
 
-      } else {
-        setStatus("❌ Failed to send. Please check your form or try again.");
-      }
-
-      console.log(formData);
-    } catch (error) {
-      console.log(error);
-      setStatus(error?.message);
+    if (data?.success) {
+              router.push("/thankyou");   
+      setLoading(false);
+      setStatus("✅ Message sent successfully!");
+      setName("");
+      setEmail("");
+      setCountry("");
+      setPhone("");
+      setMessage("");
+    } else {
+      setStatus("❌ Failed to send. Please check your form or try again.");
     }
-  };
+  } catch (error) {
+    console.log(error);
+    setStatus(error?.message);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800 lg:mt-14">
@@ -109,7 +111,7 @@ export default function SalfordLandingPage() {
             </button>
 
             <a
-              href="/products"
+              href="/contact-us"
               className="px-8 py-3 text-lg font-medium text-blue-600 border-2 border-blue-600 rounded-lg bg-blue-50 transition duration-300"
             >
               Explore Our Featured Grades
@@ -339,7 +341,7 @@ export default function SalfordLandingPage() {
       <section className="px-3 py-8   flex flex-col md:flex-row bg-gray-100 md:px-5 md:gap-5 lg:px-44 lg:gap-10 lg:py-12">
         <div className="md:w-1/2">
           <p className="uppercase font-medium text-gray-950 md:text-lg">
-            We're here to help your
+            We're here to help you
           </p>
           <p className="text-3xl font-semibold py-5 text-gray-950 md:text-4xl">
             <span className="font-bold text-blue-600">Discuss</span> Your
@@ -428,6 +430,7 @@ export default function SalfordLandingPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 name="message"
                 type="text"
+                required
                 placeholder="Inform me about this"
                 className="bg-gray-200 px-3 py-1 rounded-lg"
               />
