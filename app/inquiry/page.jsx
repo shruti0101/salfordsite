@@ -13,6 +13,7 @@ import Image from "next/image";
 import Crousel from "@/components/sub-components/Crousel";
 import HeroForm from "@/components/Landingpage/HeroForm";
 import { useRouter } from "next/navigation";
+import Whatsapp from "@/components/Whatsapp";
 export default function SalfordLandingPage() {
   const [openForm, setOpenForm] = useState(false);
 
@@ -503,6 +504,10 @@ const handleSubmit = async (e) => {
       {openForm && (
         <ContactForm isOpen={openForm} onClose={() => setOpenForm(false)} />
       )}
+
+
+
+      <Whatsapp></Whatsapp>
     </div>
   );
 }
