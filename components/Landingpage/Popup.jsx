@@ -1,12 +1,24 @@
 "use client";
-import React, { useRef, useState } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
+
+import { auth } from "@/lib/firebase";
+
 export default function ContactForm({ isOpen, onClose }) {
   const formRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-const router = useRouter();
+
+  const router = useRouter();
+
   // form State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -14,39 +26,85 @@ const router = useRouter();
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
 
+  // OTP states
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState(null);
+
+  useEffect(() => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+          callback: () => {},
+        }
+      );
+    }
+  }, []);
+
   if (!isOpen) return null;
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError("");
+  // SEND OTP
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  //   const formData = new FormData(formRef.current);
+  try {
+    // VALIDATION
+    if (!name.trim()) {
+      return setStatus("❌ Name is required");
+    }
 
-  //   try {
-  //     const response = await fetch("https://formsubmit.co/ajax/inquiry.promozione@gmail.com", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
+    if (phone.length !== 10) {
+      return setStatus("❌ Enter valid 10 digit phone number");
+    }
 
-  //     if (response.ok) {
-  //       setSuccess(true);
-  //       formRef.current.reset();
-  //     } else {
-  //       setError("Something went wrong. Please try again.");
-  //     }
-  //   } catch (err) {
-  //     setError("Network error. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+    if (!email.includes("@")) {
+      return setStatus("❌ Invalid email");
+    }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus("Sending...");
+    if (!message.trim()) {
+      return setStatus("❌ Message is required");
+    }
+
     setLoading(true);
-    try {
+
+    // STEP 1 → SEND OTP
+    if (!otpSent) {
+      setStatus("Sending OTP...");
+
+      const appVerifier = window.recaptchaVerifier;
+
+      const result = await signInWithPhoneNumber(
+        auth,
+        `+91${phone}`,
+        appVerifier
+      );
+
+      setConfirmationResult(result);
+
+      setOtpSent(true);
+
+      setStatus("✅ OTP sent successfully");
+    }
+
+    // STEP 2 → VERIFY OTP + SUBMIT FORM
+    else {
+      if (!otp) {
+        setLoading(false);
+        return setStatus("❌ Enter OTP");
+      }
+
+      setStatus("Verifying OTP...");
+
+      await confirmationResult.confirm(otp);
+
+      setOtpVerified(true);
+
+      setStatus("Submitting form...");
+
       const formData = {
         platform: "Salford Landing page",
         platformEmail: "sales@aanyaenterprise.com",
@@ -63,29 +121,40 @@ const router = useRouter();
       );
 
       if (data?.success) {
-                router.push("/thankyou");   
-        setLoading(false);
         setStatus("✅ Message sent successfully!");
+
+        // RESET FORM
         setName("");
         setEmail("");
         setCountry("");
         setPhone("");
         setMessage("");
+        setOtp("");
 
+        setOtpSent(false);
+        setOtpVerified(false);
 
+        // CLOSE MODAL
+        onClose();
+
+        // REDIRECT
+        router.push("/thankyou");
       } else {
-        setLoading(false);
-        setStatus("❌ Something went wrong. Please try again.");
+        setStatus("❌ Something went wrong");
       }
-      console.log(formData);
-    } catch (error) {
-      console.log(error);
-      setStatus("❌ " + error.message);
-    } finally {
-      setLoading(false);
     }
+  } catch (error) {
+    console.log(error);
 
-  };
+    if (otpSent) {
+      setStatus("❌ Invalid OTP");
+    } else {
+      setStatus("❌ Failed to send OTP");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const countries = [
     "select country",
@@ -119,24 +188,17 @@ const router = useRouter();
             ✕
           </button>
 
-          <h2 className="text-center text-2xl  font-semibold text-white tracking-wide">
+          <h2 className="text-center text-2xl font-semibold text-white tracking-wide">
             Get In Touch With Us
           </h2>
+
           <div className="w-24 h-[3px] bg-gradient-to-r from-[#00C9FF] to-[#92FE9D] mx-auto mt-3 mb-5 rounded-full"></div>
 
           <form
-            // method="post"
             ref={formRef}
             onSubmit={handleSubmit}
             className="space-y-3"
           >
-            {/* <input type="hidden" name="_subject" value="New Product Enquiry" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="product" value="Enquiry From Website" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_nosponsor" value="true" />
-            <input type="hidden" name="_cc" value="sales@aanyaenterprise.com" /> */}
-
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -149,7 +211,9 @@ const router = useRouter();
 
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/\D/g, ""))
+              }
               type="tel"
               name="phone"
               maxLength={10}
@@ -159,6 +223,9 @@ const router = useRouter();
               className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
               required
             />
+
+            {/* OTP FIELD */}
+            
 
             <input
               value={email}
@@ -170,7 +237,6 @@ const router = useRouter();
               required
             />
 
-            {/* ✅ Country Dropdown */}
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -195,27 +261,37 @@ const router = useRouter();
               className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition h-28 resize-none"
             ></textarea>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
-            >
-              {loading ? "Sending..." : "Send Message"}
-            </button>
+            
+            {otpSent && !otpVerified && (
+  <input
+    value={otp}
+    onChange={(e) => setOtp(e.target.value)}
+    type="text"
+    placeholder="Enter OTP"
+    className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
+  />
+)}
 
-            {status && (
-              <p
-                className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
-                  status.startsWith("✅")
-                    ? "bg-green-100 text-green-800"
-                    : status.startsWith("❌")
-                      ? "bg-red-100 text-red-800"
-                      : "bg-yellow-100 text-yellow-800"
-                }`}
-              >
-                {status}
-              </p>
-            )}
+
+            {/* MAIN BUTTON */}
+            <button
+  type="submit"
+  disabled={loading}
+  className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
+>
+  {loading
+    ? otpSent
+      ? "Verifying..."
+      : "Sending..."
+    : otpSent
+    ? "Verify OTP"
+    : "Send Message"}
+</button>
+
+            
+
+            {/* Firebase Recaptcha */}
+            <div id="recaptcha-container"></div>
           </form>
         </div>
       </div>

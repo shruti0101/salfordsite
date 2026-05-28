@@ -1,11 +1,23 @@
+"use client";
+
 import { countries } from "@/Data";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
+
+import { auth } from "@/lib/firebase";
+
 const HeroForm = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
-  const router = useRouter();   
+
+  const router = useRouter();
+
   // form State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,44 +25,122 @@ const HeroForm = () => {
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
 
+  // OTP states
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState(null);
+
+  // Firebase Recaptcha
+  useEffect(() => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container-hero",
+        {
+          size: "invisible",
+          callback: () => {},
+        }
+      );
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("Sending...");
-    setLoading(true);
+
     try {
-      const formData = {
-        platform: "Salford Landing page",
-        platformEmail: "sales@aanyaenterprise.com",
-        name,
-        email,
-        place: country,
-        phone,
-        message,
-      };
-
-      const { data } = await axios.post(
-        "https://brandbnalo.com/api/form/add",
-        formData
-      );
-
-      if (data?.success) {
-
-                router.push("/thankyou");   
-        setLoading(false);
-        setStatus("✅ Message sent successfully!");
-        setName("");
-        setEmail("");
-        setCountry("");
-        setPhone("");
-        setMessage("");
-      } else {
-        setStatus("❌ Failed to send. Please check your form or try again.");
+      // validations
+      if (!name.trim()) {
+        return setStatus("❌ Name is required");
       }
 
-      console.log(formData);
+      if (!email.includes("@")) {
+        return setStatus("❌ Invalid email");
+      }
+
+      if (!/^\d{10}$/.test(phone)) {
+        return setStatus("❌ Enter valid 10 digit number");
+      }
+
+      setLoading(true);
+
+      // STEP 1 -> SEND OTP
+      if (!otpSent) {
+        setStatus("Sending OTP...");
+
+        const appVerifier = window.recaptchaVerifier;
+
+        const result = await signInWithPhoneNumber(
+          auth,
+          `+91${phone}`,
+          appVerifier
+        );
+
+        setConfirmationResult(result);
+
+        setOtpSent(true);
+
+        setStatus("✅ OTP sent successfully");
+      }
+
+      // STEP 2 -> VERIFY OTP + SUBMIT
+      else {
+        if (!otp) {
+          setLoading(false);
+          return setStatus("❌ Enter OTP");
+        }
+
+        
+        await confirmationResult.confirm(otp);
+
+        setOtpVerified(true);
+
+        
+
+        const formData = {
+          platform: "Salford Landing page",
+          platformEmail: "sales@aanyaenterprise.com",
+          name,
+          email,
+          place: country,
+          phone,
+          message,
+        };
+
+        const { data } = await axios.post(
+          "https://brandbnalo.com/api/form/add",
+          formData
+        );
+
+        if (data?.success) {
+          setStatus("✅ Message sent successfully!");
+
+          // reset form
+          setName("");
+          setEmail("");
+          setCountry("");
+          setPhone("");
+          setMessage("");
+          setOtp("");
+
+          setOtpSent(false);
+          setOtpVerified(false);
+
+          router.push("/thankyou");
+        } else {
+          setStatus("❌ Failed to send. Please try again.");
+        }
+      }
     } catch (error) {
       console.log(error);
-      setStatus(error?.message);
+
+      if (otpSent) {
+        setStatus("❌ Invalid OTP");
+      } else {
+        setStatus("❌ Failed to send OTP");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,14 +149,17 @@ const HeroForm = () => {
       <p className="uppercase font-medium text-gray-950 md:text-lg text-center">
         We're here to help your
       </p>
+
       <p className="text-3xl font-semibold py-5 text-gray-950 md:text-4xl text-center">
         <span className="font-bold text-blue-600">Discuss</span> Your Chemical
         Solution Needs
       </p>
+
       <p className="text-sm text-blue-950 py-3 md:text-lg text-center">
         Are you looking for top-quality chemical tailored to your needs? Reach
         out to us.
       </p>
+
       <form
         onSubmit={handleSubmit}
         className=" flex items-center flex-col justify-center gap-3 py-5 px-5 md:flex-row lg:px-10 md:gap-1 lg:gap-5"
@@ -78,6 +171,7 @@ const HeroForm = () => {
           placeholder="Name"
           className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full md:scale-105 "
         />
+
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -85,25 +179,28 @@ const HeroForm = () => {
           placeholder="Email"
           className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full md:scale-105 "
         />
+
         <input
           type="tel"
           name="phone"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) =>
+            setPhone(e.target.value.replace(/\D/g, ""))
+          }
           maxLength={10}
           minLength={10}
           pattern="[0-9]{10}"
           placeholder="Phone"
           className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full md:scale-105 "
         />
+
         <select
           name="country"
           value={country}
           onChange={(e) => setCountry(e.target.value)}
           defaultValue=""
           required
-          placeholder="Email"
-          className="border rounded-2xl bg-white text-black shadow-lg w-full md:scale-105  p-3"
+          className="border rounded-2xl bg-white text-black shadow-lg w-full md:scale-105 p-3"
         >
           {countries.map((country, idx) => (
             <option key={idx} value={country} className="text-black">
@@ -121,28 +218,52 @@ const HeroForm = () => {
           className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full "
         />
 
+        {/* OTP INPUT */}
+        {otpSent && !otpVerified && (
+          <input
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            type="text"
+            placeholder="Enter OTP"
+            className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full"
+          />
+        )}
+
+        {/* SINGLE BUTTON */}
         <button
           type="submit"
           disabled={loading}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg w-full"
         >
-          {loading ? "Sending..." : "Send Message"}
+          {loading
+            ? otpSent
+              ? "Verifying..."
+              : "Sending..."
+            : otpSent
+            ? "Verify OTP"
+            : "Send Message"}
         </button>
 
-        {status && (
+        
+
+        {/* Firebase Recaptcha */}
+        <div id="recaptcha-container-hero"></div>
+      </form>
+      {status && (
+        <div className="max-w-7xl mx-auto flex justify-center items-center">
           <p
-            className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
+            className={`text-center mt-4 w-[30%] text-sm font-medium p-3 rounded-lg ${
               status.startsWith("✅")
                 ? "bg-green-100 text-green-800"
                 : status.startsWith("❌")
-                  ? "bg-red-100 text-red-800"
-                  : "bg-yellow-100 text-yellow-800"
+                ? "bg-red-100 text-red-800"
+                : "bg-yellow-100 text-yellow-800"
             }`}
           >
             {status}
           </p>
+          </div>
         )}
-      </form>
     </div>
   );
 };
