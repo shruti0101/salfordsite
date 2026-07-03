@@ -1,16 +1,9 @@
 "use client";
 
 import { countries } from "@/Data";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
-
-import { auth } from "@/lib/firebase";
 
 const HeroForm = () => {
   const [loading, setLoading] = useState(false);
@@ -26,24 +19,8 @@ const HeroForm = () => {
   const [message, setMessage] = useState("");
 
   // OTP states
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
 
   // Firebase Recaptcha
-  useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container-hero",
-        {
-          size: "invisible",
-          callback: () => {},
-        }
-      );
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,80 +42,42 @@ const HeroForm = () => {
       setLoading(true);
 
       // STEP 1 -> SEND OTP
-      if (!otpSent) {
-        setStatus("Sending OTP...");
-
-        const appVerifier = window.recaptchaVerifier;
-
-        const result = await signInWithPhoneNumber(
-          auth,
-          `+91${phone}`,
-          appVerifier
-        );
-
-        setConfirmationResult(result);
-
-        setOtpSent(true);
-
-        setStatus("✅ OTP sent successfully");
-      }
 
       // STEP 2 -> VERIFY OTP + SUBMIT
-      else {
-        if (!otp) {
-          setLoading(false);
-          return setStatus("❌ Enter OTP");
-        }
 
-        
-        await confirmationResult.confirm(otp);
+      const formData = {
+        platform: "Salford Landing page",
+        platformEmail: "sales@aanyaenterprise.com",
+        name,
+        email,
+        place: country,
+        phone,
+        message,
+      };
 
-        setOtpVerified(true);
+      const { data } = await axios.post(
+        "https://brandbnalo.com/api/form/add",
+        formData,
+      );
 
-        
+      if (data?.success) {
+        setStatus("✅ Message sent successfully!");
 
-        const formData = {
-          platform: "Salford Landing page",
-          platformEmail: "sales@aanyaenterprise.com",
-          name,
-          email,
-          place: country,
-          phone,
-          message,
-        };
-
-        const { data } = await axios.post(
-          "https://brandbnalo.com/api/form/add",
-          formData
-        );
-
-        if (data?.success) {
-          setStatus("✅ Message sent successfully!");
-
-          // reset form
-          setName("");
-          setEmail("");
-          setCountry("");
-          setPhone("");
-          setMessage("");
-          setOtp("");
-
-          setOtpSent(false);
-          setOtpVerified(false);
-
-          router.push("/thankyou");
-        } else {
-          setStatus("❌ Failed to send. Please try again.");
-        }
+        // reset form
+        setName("");
+        setEmail("");
+        setCountry("");
+        setPhone("");
+        setMessage("");
+       
+        router.push("/thankyou");
+      } else {
+        setStatus("❌ Failed to send. Please try again.");
       }
     } catch (error) {
       console.log(error);
 
-      if (otpSent) {
-        setStatus("❌ Invalid OTP");
-      } else {
-        setStatus("❌ Failed to send OTP");
-      }
+      setStatus("❌ Failed to Submit");
     } finally {
       setLoading(false);
     }
@@ -184,9 +123,7 @@ const HeroForm = () => {
           type="tel"
           name="phone"
           value={phone}
-          onChange={(e) =>
-            setPhone(e.target.value.replace(/\D/g, ""))
-          }
+          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
           maxLength={10}
           minLength={10}
           pattern="[0-9]{10}"
@@ -219,15 +156,6 @@ const HeroForm = () => {
         />
 
         {/* OTP INPUT */}
-        {otpSent && !otpVerified && (
-          <input
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            type="text"
-            placeholder="Enter OTP"
-            className="border py-2 px-3 rounded-2xl bg-white text-black shadow-lg w-full"
-          />
-        )}
 
         {/* SINGLE BUTTON */}
         <button
@@ -235,19 +163,10 @@ const HeroForm = () => {
           disabled={loading}
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg w-full"
         >
-          {loading
-            ? otpSent
-              ? "Verifying..."
-              : "Sending..."
-            : otpSent
-            ? "Verify OTP"
-            : "Send Message"}
+          {loading ? "Sending..." : "Send Message"}
         </button>
 
-        
-
         {/* Firebase Recaptcha */}
-        <div id="recaptcha-container-hero"></div>
       </form>
       {status && (
         <div className="max-w-7xl mx-auto flex justify-center items-center">
@@ -256,14 +175,14 @@ const HeroForm = () => {
               status.startsWith("✅")
                 ? "bg-green-100 text-green-800"
                 : status.startsWith("❌")
-                ? "bg-red-100 text-red-800"
-                : "bg-yellow-100 text-yellow-800"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-yellow-100 text-yellow-800"
             }`}
           >
             {status}
           </p>
-          </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };

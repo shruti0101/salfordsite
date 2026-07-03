@@ -14,29 +14,19 @@ import Crousel from "@/components/sub-components/Crousel";
 import HeroForm from "@/components/Landingpage/HeroForm";
 import { useRouter } from "next/navigation";
 import Whatsapp from "@/components/Whatsapp";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
 
-import { auth } from "@/lib/firebase";
 export default function SalfordLandingPage() {
+  const router = useRouter();
 
-
-const router = useRouter();
-
-
-// OTP states
-const [otp, setOtp] = useState("");
-const [otpSent, setOtpSent] = useState(false);
-const [otpVerified, setOtpVerified] = useState(false);
-const [confirmationResult, setConfirmationResult] =
-  useState(null);
+  // OTP states
+  // const [otp, setOtp] = useState("");
+  // const [otpSent, setOtpSent] = useState(false);
+  // const [otpVerified, setOtpVerified] = useState(false);
+  // const [confirmationResult, setConfirmationResult] =
+  //   useState(null);
   const [openForm, setOpenForm] = useState(false);
 
   // for form
-
-
 
   // form State
   const [name, setName] = useState("");
@@ -47,71 +37,28 @@ const [confirmationResult, setConfirmationResult] =
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-       
-      }
-    );
-  }
-}, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    // validations
-    if (!name.trim()) {
-      return setStatus("❌ Name is required");
-    }
-
-    if (!email.includes("@")) {
-      return setStatus("❌ Invalid email");
-    }
-
-    if (!/^\d{10}$/.test(phone)) {
-      return setStatus("❌ Enter valid 10 digit number");
-    }
-
-    setLoading(true);
-
-    // STEP 1 -> SEND OTP
-    if (!otpSent) {
-      setStatus("Sending OTP...");
-
-      const appVerifier = window.recaptchaVerifier;
-
-      const result = await signInWithPhoneNumber(
-        auth,
-        `+91${phone}`,
-        appVerifier
-      );
-
-      setConfirmationResult(result);
-
-      setOtpSent(true);
-
-      setStatus("✅ OTP sent successfully");
-    }
-
-    // STEP 2 -> VERIFY OTP + SUBMIT FORM
-    else {
-      if (!otp) {
-        setLoading(false);
-        return setStatus("❌ Enter OTP");
+    try {
+      // validations
+      if (!name.trim()) {
+        return setStatus("❌ Name is required");
       }
 
-      setStatus("Verifying OTP...");
+      if (!email.includes("@")) {
+        return setStatus("❌ Invalid email");
+      }
 
-      await confirmationResult.confirm(otp);
+      if (!/^\d{10}$/.test(phone)) {
+        return setStatus("❌ Enter valid 10 digit number");
+      }
 
-      setOtpVerified(true);
+      setLoading(true);
 
-      setStatus("Submitting form...");
+      // STEP 1 -> SEND OTP
+
+      // STEP 2 -> VERIFY OTP + SUBMIT FORM
 
       const formData = {
         platform: "Salford Landing page",
@@ -125,7 +72,7 @@ const handleSubmit = async (e) => {
 
       const { data } = await axios.post(
         "https://brandbnalo.com/api/form/add",
-        formData
+        formData,
       );
 
       if (data?.success) {
@@ -137,29 +84,22 @@ const handleSubmit = async (e) => {
         setCountry("");
         setPhone("");
         setMessage("");
-        setOtp("");
+        
 
-        setOtpSent(false);
-        setOtpVerified(false);
+        
 
         router.push("/thankyou");
       } else {
         setStatus("❌ Failed to send");
       }
-    }
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
 
-    if (otpSent) {
-      setStatus("❌ Invalid OTP");
-    } else {
-      setStatus("❌ Failed to send OTP");
+      setStatus("❌ Failed to Submit");
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800 lg:mt-14">
@@ -442,146 +382,122 @@ const handleSubmit = async (e) => {
         </div>
         <div className="md:w-1/2">
           <form
-  onSubmit={handleSubmit}
-  className="bg-white px-2 py-5 rounded-xl md:px-5 lg:px-10"
->
-  <div className="flex flex-col my-3">
-    <label htmlFor="name" className="font-semibold">
-      Name
-    </label>
+            onSubmit={handleSubmit}
+            className="bg-white px-2 py-5 rounded-xl md:px-5 lg:px-10"
+          >
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Name
+              </label>
 
-    <input
-      value={name}
-      onChange={(e) => setName(e.target.value)}
-      required
-      type="text"
-      name="name"
-      placeholder="Your Name"
-      className="bg-gray-200 px-3 py-1 rounded-lg"
-    />
-  </div>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
 
-  <div className="flex flex-col my-3">
-    <label htmlFor="name" className="font-semibold">
-      Email
-    </label>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Email
+              </label>
 
-    <input
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      type="email"
-      name="email"
-      placeholder="Email"
-      className="bg-gray-200 px-3 py-1 rounded-lg"
-    />
-  </div>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
 
-  <div className="flex flex-col my-3">
-    <label htmlFor="name" className="font-semibold">
-      Country
-    </label>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Country
+              </label>
 
-    <select
-      value={country}
-      onChange={(e) => setCountry(e.target.value)}
-      name="country"
-      defaultValue=""
-      required
-      className="bg-gray-200 px-3 py-1 rounded-lg"
-    >
-      {countries.map((country, idx) => (
-        <option key={idx} value={country} className="text-black">
-          {country}
-        </option>
-      ))}
-    </select>
-  </div>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                name="country"
+                defaultValue=""
+                required
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              >
+                {countries.map((country, idx) => (
+                  <option key={idx} value={country} className="text-black">
+                    {country}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-  <div className="flex flex-col my-3">
-    <label htmlFor="name" className="font-semibold">
-      Phone
-    </label>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Phone
+              </label>
 
-    <input
-      value={phone}
-      onChange={(e) =>
-        setPhone(e.target.value.replace(/\D/g, ""))
-      }
-      type="tel"
-      name="phone"
-      maxLength={10}
-      minLength={10}
-      pattern="[0-9]{10}"
-      placeholder="Enter Phone Number"
-      className="bg-gray-200 px-3 py-1 rounded-lg"
-    />
-  </div>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                type="tel"
+                name="phone"
+                maxLength={10}
+                minLength={10}
+                pattern="[0-9]{10}"
+                placeholder="Enter Phone Number"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
 
-  <div className="flex flex-col my-3">
-    <label htmlFor="name" className="font-semibold">
-      Message
-    </label>
+            <div className="flex flex-col my-3">
+              <label htmlFor="name" className="font-semibold">
+                Message
+              </label>
 
-    <textarea
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      name="message"
-      type="text"
-      required
-      placeholder="Inform me about this"
-      className="bg-gray-200 px-3 py-1 rounded-lg"
-    />
-  </div>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                name="message"
+                type="text"
+                required
+                placeholder="Inform me about this"
+                className="bg-gray-200 px-3 py-1 rounded-lg"
+              />
+            </div>
 
-  {/* OTP FIELD */}
-  {otpSent && !otpVerified && (
-    <div className="flex flex-col my-3">
-      <label htmlFor="otp" className="font-semibold">
-        Enter OTP
-      </label>
+            {/* OTP FIELD */}
 
-      <input
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        type="text"
-        placeholder="Enter OTP"
-        className="bg-gray-200 px-3 py-1 rounded-lg"
-      />
-    </div>
-  )}
+            {/* SINGLE BUTTON */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="my-4 rounded-full bg-[#0071E9] text-white py-2 px-5"
+            >
+              {loading ? "Sending..." : "Get a solution"}
+            </button>
 
-  {/* SINGLE BUTTON */}
-  <button
-    type="submit"
-    disabled={loading}
-    className="my-4 rounded-full bg-[#0071E9] text-white py-2 px-5"
-  >
-    {loading
-      ? otpSent
-        ? "Verifying..."
-        : "Sending..."
-      : otpSent
-      ? "Verify OTP"
-      : "Get a solution"}
-  </button>
+            {status && (
+              <p
+                className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
+                  status.startsWith("✅")
+                    ? "bg-green-100 text-green-800"
+                    : status.startsWith("❌")
+                      ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
+                }`}
+              >
+                {status}
+              </p>
+            )}
 
-  {status && (
-    <p
-      className={`text-center mt-4 text-sm font-medium p-3 rounded-lg ${
-        status.startsWith("✅")
-          ? "bg-green-100 text-green-800"
-          : status.startsWith("❌")
-          ? "bg-red-100 text-red-800"
-          : "bg-yellow-100 text-yellow-800"
-      }`}
-    >
-      {status}
-    </p>
-  )}
-
-  {/* Firebase Recaptcha */}
-  <div id="recaptcha-container"></div>
-</form>
+            {/* Firebase Recaptcha */}
+          </form>
         </div>
       </section>
 
@@ -627,8 +543,6 @@ const handleSubmit = async (e) => {
       {openForm && (
         <ContactForm isOpen={openForm} onClose={() => setOpenForm(false)} />
       )}
-
-
 
       <Whatsapp></Whatsapp>
     </div>
