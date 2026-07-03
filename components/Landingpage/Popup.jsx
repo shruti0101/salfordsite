@@ -1,15 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
-
-import { auth } from "@/lib/firebase";
 
 export default function ContactForm({ isOpen, onClose }) {
   const formRef = useRef(null);
@@ -27,81 +20,36 @@ export default function ContactForm({ isOpen, onClose }) {
   const [message, setMessage] = useState("");
 
   // OTP states
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
-
-  useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: () => {},
-        }
-      );
-    }
-  }, []);
 
   if (!isOpen) return null;
 
   // SEND OTP
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    // VALIDATION
-    if (!name.trim()) {
-      return setStatus("❌ Name is required");
-    }
-
-    if (phone.length !== 10) {
-      return setStatus("❌ Enter valid 10 digit phone number");
-    }
-
-    if (!email.includes("@")) {
-      return setStatus("❌ Invalid email");
-    }
-
-    if (!message.trim()) {
-      return setStatus("❌ Message is required");
-    }
-
-    setLoading(true);
-
-    // STEP 1 → SEND OTP
-    if (!otpSent) {
-      setStatus("Sending OTP...");
-
-      const appVerifier = window.recaptchaVerifier;
-
-      const result = await signInWithPhoneNumber(
-        auth,
-        `+91${phone}`,
-        appVerifier
-      );
-
-      setConfirmationResult(result);
-
-      setOtpSent(true);
-
-      setStatus("✅ OTP sent successfully");
-    }
-
-    // STEP 2 → VERIFY OTP + SUBMIT FORM
-    else {
-      if (!otp) {
-        setLoading(false);
-        return setStatus("❌ Enter OTP");
+    try {
+      // VALIDATION
+      if (!name.trim()) {
+        return setStatus("❌ Name is required");
       }
 
-      setStatus("Verifying OTP...");
+      if (phone.length !== 10) {
+        return setStatus("❌ Enter valid 10 digit phone number");
+      }
 
-      await confirmationResult.confirm(otp);
+      if (!email.includes("@")) {
+        return setStatus("❌ Invalid email");
+      }
 
-      setOtpVerified(true);
+      if (!message.trim()) {
+        return setStatus("❌ Message is required");
+      }
+
+      setLoading(true);
+
+      // STEP 1 → SEND OTP
+
+      // STEP 2 → VERIFY OTP + SUBMIT FORM
 
       setStatus("Submitting form...");
 
@@ -117,7 +65,7 @@ export default function ContactForm({ isOpen, onClose }) {
 
       const { data } = await axios.post(
         "https://brandbnalo.com/api/form/add",
-        formData
+        formData,
       );
 
       if (data?.success) {
@@ -129,10 +77,10 @@ export default function ContactForm({ isOpen, onClose }) {
         setCountry("");
         setPhone("");
         setMessage("");
-        setOtp("");
+        // setOtp("");
 
-        setOtpSent(false);
-        setOtpVerified(false);
+        // setOtpSent(false);
+        // setOtpVerified(false);
 
         // CLOSE MODAL
         onClose();
@@ -142,19 +90,14 @@ export default function ContactForm({ isOpen, onClose }) {
       } else {
         setStatus("❌ Something went wrong");
       }
-    }
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
 
-    if (otpSent) {
-      setStatus("❌ Invalid OTP");
-    } else {
-      setStatus("❌ Failed to send OTP");
+      setStatus("❌ Failed to Submit");
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const countries = [
     "select country",
@@ -194,11 +137,7 @@ export default function ContactForm({ isOpen, onClose }) {
 
           <div className="w-24 h-[3px] bg-gradient-to-r from-[#00C9FF] to-[#92FE9D] mx-auto mt-3 mb-5 rounded-full"></div>
 
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit}
-            className="space-y-3"
-          >
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -211,9 +150,7 @@ export default function ContactForm({ isOpen, onClose }) {
 
             <input
               value={phone}
-              onChange={(e) =>
-                setPhone(e.target.value.replace(/\D/g, ""))
-              }
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               type="tel"
               name="phone"
               maxLength={10}
@@ -225,7 +162,6 @@ export default function ContactForm({ isOpen, onClose }) {
             />
 
             {/* OTP FIELD */}
-            
 
             <input
               value={email}
@@ -261,37 +197,16 @@ export default function ContactForm({ isOpen, onClose }) {
               className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition h-28 resize-none"
             ></textarea>
 
-            
-            {otpSent && !otpVerified && (
-  <input
-    value={otp}
-    onChange={(e) => setOtp(e.target.value)}
-    type="text"
-    placeholder="Enter OTP"
-    className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/70 focus:ring-2 focus:ring-[#00C9FF] focus:border-transparent transition"
-  />
-)}
-
-
             {/* MAIN BUTTON */}
             <button
-  type="submit"
-  disabled={loading}
-  className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
->
-  {loading
-    ? otpSent
-      ? "Verifying..."
-      : "Sending..."
-    : otpSent
-    ? "Verify OTP"
-    : "Send Message"}
-</button>
-
-            
+              type="submit"
+              disabled={loading}
+              className="w-full py-2 bg-gradient-to-r from-[#00C9FF] to-[#0077E6] hover:from-[#0077E6] hover:to-[#00C9FF] transition-all duration-300 rounded-lg font-semibold text-white text-base shadow-lg shadow-[#00C9FF]/30"
+            >
+              {loading ? "Sending..." : "Send Message"}
+            </button>
 
             {/* Firebase Recaptcha */}
-            <div id="recaptcha-container"></div>
           </form>
         </div>
       </div>

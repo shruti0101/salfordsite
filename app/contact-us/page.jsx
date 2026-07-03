@@ -2,10 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 import { auth } from "@/lib/firebase";
 
@@ -21,118 +18,107 @@ const Page = () => {
   const [message, setMessage] = useState("");
 
   // OTP states
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  // const [otp, setOtp] = useState("");
+  // const [otpSent, setOtpSent] = useState(false);
+  // const [otpVerified, setOtpVerified] = useState(false);
+  // const [confirmationResult, setConfirmationResult] = useState(null);
 
-   useEffect(() => {
-    if (typeof window === "undefined") return;
+  //  useEffect(() => {
+  //   if (typeof window === "undefined") return;
 
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-        }
-      );
+  //   if (!window.recaptchaVerifier) {
+  //     window.recaptchaVerifier = new RecaptchaVerifier(
+  //       auth,
+  //       "recaptcha-container",
+  //       {
+  //         size: "invisible",
+  //       }
+  //     );
 
-      window.recaptchaVerifier.render();
-    }
-  }, []);
+  //     window.recaptchaVerifier.render();
+  //   }
+  // }, []);
 
   // SEND OTP
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // validations
-    if (!firstName.trim())
-      return setStatus("❌ First name is required");
+    if (!firstName.trim()) return setStatus("❌ First name is required");
 
-    if (!lastName.trim())
-      return setStatus("❌ Last name is required");
+    if (!lastName.trim()) return setStatus("❌ Last name is required");
 
-    if (!/^\d{10}$/.test(phone))
-      return setStatus("❌ Phone must be 10 digits");
+    if (!/^\d{10}$/.test(phone)) return setStatus("❌ Phone must be 10 digits");
 
-    if (!email.includes("@"))
-      return setStatus("❌ Invalid email address");
+    if (!email.includes("@")) return setStatus("❌ Invalid email address");
 
-    if (!message.trim())
-      return setStatus("❌ Message cannot be empty");
+    if (!message.trim()) return setStatus("❌ Message cannot be empty");
 
     try {
       setLoading(true);
 
       // IF OTP NOT SENT
-      if (!otpSent) {
-        setStatus("Sending OTP...");
+      // if (!otpSent) {
+      //   setStatus("Sending OTP...");
 
-        const appVerifier = window.recaptchaVerifier;
+      //   const appVerifier = window.recaptchaVerifier;
 
-        const result = await signInWithPhoneNumber(
-          auth,
-          `+91${phone}`,
-          appVerifier
-        );
+      //   const result = await signInWithPhoneNumber(
+      //     auth,
+      //     `+91${phone}`,
+      //     appVerifier
+      //   );
 
-        setConfirmationResult(result);
-        setOtpSent(true);
+      //   setConfirmationResult(result);
+      //   setOtpSent(true);
 
-        setStatus("✅ OTP sent successfully");
-      }
+      //   setStatus("✅ OTP sent successfully");
+      // }
 
       // IF OTP SENT -> VERIFY + SUBMIT
-      else {
-        
+      // else {
 
-        await confirmationResult.confirm(otp);
+      // await confirmationResult.confirm(otp);
 
-        setOtpVerified(true);
+      // setOtpVerified(true);
 
-        setStatus("Submitting form...");
+      setStatus("Submitting form...");
 
-        const formData = {
-          platform: "Contact Us Page",
-          platformEmail: "sales@aanyaenterprise.com",
-          name: `${firstName} ${lastName}`,
-          email,
-          phone,
-          place: "N/A",
-          message,
-        };
+      const formData = {
+        platform: "Contact Us Page",
+        platformEmail: "sales@aanyaenterprise.com",
+        name: `${firstName} ${lastName}`,
+        email,
+        phone,
+        place: "N/A",
+        message,
+      };
 
-        const { data } = await axios.post(
-          "https://brandbnalo.com/api/form/add",
-          formData
-        );
+      const { data } = await axios.post(
+        "https://brandbnalo.com/api/form/add",
+        formData,
+      );
 
-        if (data?.success) {
-          setStatus("✅ Message sent successfully!");
+      if (data?.success) {
+        setStatus("✅ Message sent successfully!");
 
-          // reset form
-          setFirstName("");
-          setLastName("");
-          setPhone("");
-          setEmail("");
-          setMessage("");
-          setOtp("");
+        // reset form
+        setFirstName("");
+        setLastName("");
+        setPhone("");
+        setEmail("");
+        setMessage("");
+        // setOtp("");
 
-          setOtpSent(false);
-          setOtpVerified(false);
-        } else {
-          setStatus("❌ Something went wrong. Try again.");
-        }
+        // setOtpSent(false);
+        // setOtpVerified(false);
+      } else {
+        setStatus("❌ Something went wrong. Try again.");
       }
     } catch (error) {
       console.log(error);
 
-      if (otpSent) {
-        setStatus("❌ Invalid OTP");
-      } else {
-        setStatus("❌ Failed to send OTP");
-      }
+      setStatus("❌ Faild to Submit");
     } finally {
       setLoading(false);
     }
@@ -232,8 +218,6 @@ const Page = () => {
                     />
                   </div>
 
-                  
-
                   <textarea
                     placeholder="Message"
                     rows={5}
@@ -244,7 +228,7 @@ const Page = () => {
                   ></textarea>
 
                   {/* OTP INPUT */}
-                  {otpSent && !otpVerified && (
+                  {/* {otpSent && !otpVerified && (
                     <input
                       type="text"
                       placeholder="Enter OTP"
@@ -252,8 +236,8 @@ const Page = () => {
                       onChange={(e) => setOtp(e.target.value)}
                       className="w-full p-4 rounded-xl border border-gray-200 bg-white/80 focus:outline-none focus:ring-2 focus:ring-[#0047b3]"
                     />
-                  )}
-                   {status && (
+                  )} */}
+                  {status && (
                     <p
                       className={`text-center text-sm font-medium p-3 rounded-lg ${
                         status.startsWith("✅")
@@ -271,19 +255,11 @@ const Page = () => {
                     disabled={loading}
                     className="bg-gradient-to-r from-[#0047b3] to-[#0066cc] text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:from-[#003a99] hover:to-[#0052a3] transition-all w-full"
                   >
-                    {loading
-                      ? otpSent
-                        ? "Verifying..."
-                        : "Sending..."
-                      : otpSent
-                      ? "Verify OTP"
-                      : "Send Message"}
+                    {loading ? "Sending..." : "Send Message"}
                   </button>
 
-                 
-
                   {/* Firebase Recaptcha */}
-                  <div id="recaptcha-container"></div>
+                  {/* <div id="recaptcha-container"></div> */}
                 </form>
               </div>
             </div>
