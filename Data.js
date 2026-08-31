@@ -303,60 +303,123 @@ export const categories = [
         },
       },
 
-      {
-        id: "salford-626",
-        name: "SALFORD 626",
-        metaTitle: "SALFORD 626",
-        metaDescription: "SALFORD 626",
-        banner: "/products/626.webp",
-        excerpt: [
-          {
-            type: "p",
-            text: "SALFORD 626 is a chloride-process rutile titanium dioxide pigment with a neutral tint, designed for high outdoor durability, excellent brightness, and superior opacity, ideal for PVC, engineering plastics, and masterbatch applications.",
-          },
+     {
+  id: "salford-626",
+  name: "SALFORD 626",
+  metaTitle: "SALFORD 626",
+  metaDescription: "SALFORD 626",
+  banner: "/products/626.webp",
+
+  excerpt: [
+    {
+      type: "p",
+      text: "SALFORD 626 is a chloride-process rutile titanium dioxide pigment with a neutral tint, designed for high outdoor durability, excellent brightness, and superior opacity, ideal for PVC, engineering plastics, and masterbatch applications.",
+    },
+  ],
+
+  description: [
+    {
+      type: "h2",
+      text: "SALFORD 626",
+    },
+    {
+      type: "p",
+      text: "SALFORD 626 is a multi-purpose, Neutral tint tone, chloride-process, rutile titanium dioxide pigment, designed for plastics requiring high outdoor durability and excellent optical properties.",
+    },
+
+    {
+      type: "h2",
+      text: "Technical Specifications – SALFORD 626",
+    },
+    {
+      type: "table",
+      headers: ["Property", "Specification"],
+      rows: [
+        [
+          "Product Type",
+          "Production rutile pigment produced by chloride process",
         ],
-
-        description: [
-          { type: "h2", text: "SALFORD 626" },
-          {
-            type: "p",
-            text: "SALFORD 626 is a multi-purpose, Neutral tint tone, chloride-process, rutile titanium dioxide pigment, designed for plastics requiring high outdoor durability and excellent optical properties",
-          },
-          { type: "h2", text: "Key Features – SALFORD 626" },
-
-          {
-            type: "ul",
-            items: [
-              "Lends colored systems a neutral tone",
-              "Is readily wetted and dispersed",
-              "Imparts very high brightness and a neutral tone",
-              "Delivers high tinting strength and opacity",
-              "Increases the durability of plastics used outdoors",
-            ],
-          },
-
-          {
-            type: "h2",
-            text: "Application - SALFORD 626 is recommended for evaluation in:",
-          },
-          {
-            type: "ul",
-            items: [
-              "PVC profiles and sidings",
-              "Engineering plastics",
-              "Flexible PVC",
-              "Plastisols",
-              "Polyolefins",
-              "Plasticizer pastes and liquid colors",
-              "Polystyrene and copolymers",
-            ],
-          },
+        [
+          "Surface Treatment",
+          "Alumina, silicon and polysiloxane compounds",
         ],
-        pdfs: {
-          sds: "/sds2.pdf",
-          tds: "/products/626.pdf",
-        },
-      },
+        [
+          "TiO₂ Content (DIN EN ISO 591)",
+          "≥95%",
+        ],
+        [
+          "Standard Classification",
+          "R2",
+        ],
+        [
+          "ASTM D 476 Type",
+          "Type II, III & V",
+        ],
+        [
+          "Density (DIN EN 787-10)",
+          "4.0 g/cm³",
+        ],
+        [
+          "CIE L*, Dry Powder (GB/T 5950-2006)",
+          "99.4%",
+        ],
+        [
+          "Bulking Value*",
+          "0.25 l/kg (0.03 gal/lb)",
+        ],
+        [
+          "Oil Absorption (DIN EN ISO 787-5)*",
+          "17 g/100 g pigment",
+        ],
+        [
+          "Color Index",
+          "Pigment White 6 (77891)",
+        ],
+        [
+          "CAS No.",
+          "13463-67-7",
+        ],
+      ],
+    },
+
+    {
+      type: "h2",
+      text: "Key Features – SALFORD 626",
+    },
+    {
+      type: "ul",
+      items: [
+        "Lends colored systems a neutral tone",
+        "Is readily wetted and dispersed",
+        "Imparts very high brightness and a neutral tone",
+        "Delivers high tinting strength and opacity",
+        "Increases the durability of plastics used outdoors",
+      ],
+    },
+
+    {
+      type: "h2",
+      text: "Application - SALFORD 626 is recommended for evaluation in:",
+    },
+    {
+      type: "ul",
+      items: [
+        "PVC profiles and sidings",
+        "Engineering plastics",
+        "Flexible PVC",
+        "Plastisols",
+        "Polyolefins",
+        "Plasticizer pastes and liquid colors",
+        "Polystyrene and copolymers",
+      ],
+    },
+  ],
+
+  pdfs: {
+    sds: "/sds2.pdf",
+    tds: "/products/626.pdf",
+  },
+},
     ],
   },
 
