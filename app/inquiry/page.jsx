@@ -62,7 +62,7 @@ export default function SalfordLandingPage() {
 
       const formData = {
         platform: "Salford Landing page",
-                supplierToken:"6a19599b79a7cd6dff26a4c5"
+                supplierToken:"6a19599b79a7cd6dff26a4c5",
         
         platformEmail: "sales@aanyaenterprise.com",
         name,
