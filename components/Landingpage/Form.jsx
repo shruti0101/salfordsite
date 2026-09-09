@@ -22,6 +22,8 @@ const Form = () => {
       const formData = {
         platform: "Salford Landing page",
         platformEmail: "sales@aanyaenterprise.com",
+                supplierToken:"6a19599b79a7cd6dff26a4c5"
+        
         name,
         email,
         place: country,
